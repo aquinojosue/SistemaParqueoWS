@@ -281,4 +281,55 @@ class Api extends RestController {
         }
     }
     /// FIN DEL BLOQUE DE USUARIO ///
+    /// INICIO DEL BLOQUE DE IMAGEN ///
+    public function imagen_get($id_imagen = 0){
+        if(empty($imagen)){
+            $data = $this->db->get("imagen")->result();
+        }else{
+            $data = $this->db->get_where("imagen",['id_imagen'=>$id_imagen])->result_array();
+        }
+        if(!empty($data)){
+            $this->response($data, 200);   
+        } else{
+            $this->response(['mensaje' => 'No se encontro el dato.'],404);
+        }
+    }
+
+    //Ingresar una nueva ubicacion
+    public function imagen_post(){
+        $input = $this->input->post();
+        $this->db->insert('imagen',$input);
+        if($this->db->affected_rows() > 0)
+        {
+            $this->response(['resultado' => '1'], 200);
+        }else{
+            $this->response(['resultado' => '0'], 200);
+        }
+        //$this->db->set($input);
+        //$this->db->insert($this->db->dbprefix . 'ubicacion');
+    }
+
+    //Actualizar una ubicacion.
+    public function imagen_put($id_imagen){
+        $input = $this->put();
+        $this->db->update('imagen',$input,array('id_imagen'=>$id_imagen));
+        if($this->db->affected_rows() > 0)
+        {
+            $this->response(['resultado' => '1'], 200);
+        }else{
+            $this->response(['resultado' => '0'], 200);
+        }
+    }
+
+    //Eliminar una ubicacion
+    public function usuario_delete($id_imagen){
+        $this->db->delete('imagen',array('id_imagen'=>$id_imagen));
+        if($this->db->affected_rows() > 0)
+        {
+            $this->response(['resultado' => '1'], 200);
+        }else{
+            $this->response(['resultado' => '0'], 200);
+        }
+    }
+    /// FIN DEL BLOQUE DE IMAGEN ///
 }
