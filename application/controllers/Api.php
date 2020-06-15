@@ -180,7 +180,6 @@ class Api extends RestController {
 
     /// FIN DEL BLOQUE DE COMENTARIO ///
     /// INICIO DEL BLOQUE DE CALIFICACION ///
-
     public function calificacion_get($id_calificacion = 0){
         if(empty($id_calificacion)){
             $data = $this->db->get("calificacion")->result();
@@ -231,4 +230,55 @@ class Api extends RestController {
         }
     }
     /// FIN DEL BLOQUE DE CALIFICACION ///
+    /// INICIO DEL BLOQUE DE USUARIO ///
+    public function usuario_get($usuario = 0){
+        if(empty($usuario)){
+            $data = $this->db->get("usuario")->result();
+        }else{
+            $data = $this->db->get_where("usuario",['usuario'=>$usuario])->result_array();
+        }
+        if(!empty($data)){
+            $this->response($data, 200);   
+        } else{
+            $this->response(['mensaje' => 'No se encontro el dato.'],404);
+        }
+    }
+
+    //Ingresar una nueva ubicacion
+    public function usuario_post(){
+        $input = $this->input->post();
+        $this->db->insert('usuario',$input);
+        if($this->db->affected_rows() > 0)
+        {
+            $this->response(['resultado' => '1'], 200);
+        }else{
+            $this->response(['resultado' => '0'], 200);
+        }
+        //$this->db->set($input);
+        //$this->db->insert($this->db->dbprefix . 'ubicacion');
+    }
+
+    //Actualizar una ubicacion.
+    public function usuario_put($usuario){
+        $input = $this->put();
+        $this->db->update('usuario',$input,array('usuario'=>$usuario));
+        if($this->db->affected_rows() > 0)
+        {
+            $this->response(['resultado' => '1'], 200);
+        }else{
+            $this->response(['resultado' => '0'], 200);
+        }
+    }
+
+    //Eliminar una ubicacion
+    public function usuario_delete($usuario){
+        $this->db->delete('usuario',array('usuario'=>$usuario));
+        if($this->db->affected_rows() > 0)
+        {
+            $this->response(['resultado' => '1'], 200);
+        }else{
+            $this->response(['resultado' => '0'], 200);
+        }
+    }
+    /// FIN DEL BLOQUE DE USUARIO ///
 }
