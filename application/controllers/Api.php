@@ -79,7 +79,7 @@ class Api extends RestController {
         if(empty($id_parqueo)){
             $data = $this->db->get("parqueo")->result();
         }else{
-            $data = $this->db->get_where("parqueo",['id_parqueo'=>$id])->result_array();
+            $data = $this->db->get_where("parqueo",['id_parqueo'=>$id_parqueo])->result_array();
         }
         if(!empty($data)){
             $this->response($data, 200);   
@@ -125,4 +125,110 @@ class Api extends RestController {
         }
     }
     /// FIN DEL BLOQUE DE PARQUEO ///
+
+    /// INICIO BLOQUE DE COMENTARIO ///
+    //Obtener un arreglo de parqueos o un parqueo en especifico.
+    public function comentario_get($id_comentario = 0){
+        if(empty($id_comentario)){
+            $data = $this->db->get("comentario")->result();
+        }else{
+            $data = $this->db->get_where("comentario",['id_comentario'=>$id_comentario])->result_array();
+        }
+        if(!empty($data)){
+            $this->response($data, 200);   
+        } else{
+            $this->response(['mensaje' => 'No se encontro el dato.'],404);
+        }
+    }
+
+    //Ingresar una nueva ubicacion
+    public function comentario_post(){
+        $input = $this->input->post();
+        $this->db->insert('comentario',$input);
+        if($this->db->affected_rows() > 0)
+        {
+            $this->response(['resultado' => '1'], 200);
+        }else{
+            $this->response(['resultado' => '0'], 200);
+        }
+        //$this->db->set($input);
+        //$this->db->insert($this->db->dbprefix . 'ubicacion');
+    }
+
+    //Actualizar una ubicacion.
+    public function comentario_put($id_comentario){
+        $input = $this->put();
+        $this->db->update('comentario',$input,array('id_comentario'=>$id_comentario));
+        if($this->db->affected_rows() > 0)
+        {
+            $this->response(['resultado' => '1'], 200);
+        }else{
+            $this->response(['resultado' => '0'], 200);
+        }
+    }
+
+    //Eliminar una ubicacion
+    public function comentario_delete($id_comentario){
+        $this->db->delete('comentario',array('id_comentario'=>$id_comentario));
+        if($this->db->affected_rows() > 0)
+        {
+            $this->response(['resultado' => '1'], 200);
+        }else{
+            $this->response(['resultado' => '0'], 200);
+        }
+    }
+
+    /// FIN DEL BLOQUE DE COMENTARIO ///
+    /// INICIO DEL BLOQUE DE CALIFICACION ///
+
+    public function calificacion_get($id_calificacion = 0){
+        if(empty($id_calificacion)){
+            $data = $this->db->get("calificacion")->result();
+        }else{
+            $data = $this->db->get_where("calificion",['id_calificacion'=>$id_calificacion])->result_array();
+        }
+        if(!empty($data)){
+            $this->response($data, 200);   
+        } else{
+            $this->response(['mensaje' => 'No se encontro el dato.'],404);
+        }
+    }
+
+    //Ingresar una nueva ubicacion
+    public function calificacion_post(){
+        $input = $this->input->post();
+        $this->db->insert('calificacion',$input);
+        if($this->db->affected_rows() > 0)
+        {
+            $this->response(['resultado' => '1'], 200);
+        }else{
+            $this->response(['resultado' => '0'], 200);
+        }
+        //$this->db->set($input);
+        //$this->db->insert($this->db->dbprefix . 'ubicacion');
+    }
+
+    //Actualizar una ubicacion.
+    public function calificacion_put($id_calificacion){
+        $input = $this->put();
+        $this->db->update('calificacion',$input,array('id_calificacion'=>$id_calificacion));
+        if($this->db->affected_rows() > 0)
+        {
+            $this->response(['resultado' => '1'], 200);
+        }else{
+            $this->response(['resultado' => '0'], 200);
+        }
+    }
+
+    //Eliminar una ubicacion
+    public function calificacion_delete($id_calificacion){
+        $this->db->delete('calificacion',array('id_calificacion'=>$id_calificacion));
+        if($this->db->affected_rows() > 0)
+        {
+            $this->response(['resultado' => '1'], 200);
+        }else{
+            $this->response(['resultado' => '0'], 200);
+        }
+    }
+    /// FIN DEL BLOQUE DE CALIFICACION ///
 }
