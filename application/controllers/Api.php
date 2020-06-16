@@ -12,6 +12,8 @@ class Api extends RestController {
     {
         // Construct the parent class
         parent::__construct();
+        $this->load->helper('url');
+        $this->load->helper("file");
         $this->load->database();
     }
     /// INICIO BLOQUE UBICACION ///
@@ -283,7 +285,7 @@ class Api extends RestController {
     /// FIN DEL BLOQUE DE USUARIO ///
     /// INICIO DEL BLOQUE DE IMAGEN ///
     public function imagen_get($id_imagen = 0){
-        if(empty($imagen)){
+        if(empty($id_imagen)){
             $data = $this->db->get("imagen")->result();
         }else{
             $data = $this->db->get_where("imagen",['id_imagen'=>$id_imagen])->result_array();
@@ -322,8 +324,32 @@ class Api extends RestController {
     }
 
     //Eliminar una ubicacion
-    public function usuario_delete($id_imagen){
-        $this->db->delete('imagen',array('id_imagen'=>$id_imagen));
+    public function imagen_delete($id_imagen){
+        //Primero obtendre los datos de la imagen, para poder borrarla de los archivos.
+        $resultado = array('resultado' => 0);        
+        $data = $this->db->get_where("imagen",['id_imagen'=>$id_imagen])->result_array();
+        if(!empty($data)){
+            $archivo = FCPATH . "assets/" . $data[0]['filename'];
+            $path = realpath($archivo);
+            unlink($path);
+            $this->db->delete('imagen',array('id_imagen'=>$id_imagen));
+            if($this->db->affected_rows() > 0){
+                $resultado = array('resultado' => 1);
+            }
+        }
+        $this->response($resultado, 200);
+    }
+
+    public function imagenupload_put(){
+        //Valores esperados = base64
+        $input = $this->put();
+        $date = date('Y-m-d H:i:s');
+        $imagen = base64_decode($input['base64']);
+        $image_name = md5(uniqid(rand(), true));
+        $filename = $image_name . '.' . $input['extension'];
+        $path = FCPATH . "assets/";
+        file_put_contents($path . $filename, $imagen);
+        $this->db->insert("imagen",array('fecha_imagen' => $date,'filename' => $filename));
         if($this->db->affected_rows() > 0)
         {
             $this->response(['resultado' => '1'], 200);
