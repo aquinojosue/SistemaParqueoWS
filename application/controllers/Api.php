@@ -341,21 +341,31 @@ class Api extends RestController {
     }
 
     public function imagenupload_put(){
+        $resultado = array('resultado' => 0);   
         //Valores esperados = base64
+
         $input = $this->put();
-        $date = date('Y-m-d H:i:s');
-        $imagen = base64_decode($input['base64']);
-        $image_name = md5(uniqid(rand(), true));
-        $filename = $image_name . '.' . $input['extension'];
-        $path = FCPATH . "assets/";
-        file_put_contents($path . $filename, $imagen);
-        $this->db->insert("imagen",array('fecha_imagen' => $date,'filename' => $filename));
-        if($this->db->affected_rows() > 0)
-        {
-            $this->response(['resultado' => '1'], 200);
-        }else{
-            $this->response(['resultado' => '0'], 200);
+        if(array_key_exists('id_ubicacion',$input) || array_key_exists('id_comentario', $input)){
+            $imagen = base64_decode($input['base64']);
+            $image_name = md5(uniqid(rand(), true));
+            $filename = $image_name . '.' . $input['extension'];
+            $path = FCPATH . "assets/";
+            file_put_contents($path . $filename, $imagen);
+            $date = date('Y-m-d H:i:s');
+            $valores_insertar = array('fecha_imagen' => $date,'filename' => $filename);
+            if(array_key_exists('id_ubicacion',$input)){
+                $valores_insertar['id_ubicacion'] = $input['id_ubicacion'];
+            }
+            if(array_key_exists('id_comentario', $input)){
+                $valores_insertar['id_comentario'] = $input['id_comentario'];
+            }
+            $this->db->insert("imagen",$valores_insertar);
+            if($this->db->affected_rows() > 0)
+            {
+                $resultado = array('resultado' => 1);
+            }
         }
+        $this->response($resultado, 200);
     }
     /// FIN DEL BLOQUE DE IMAGEN ///
 }
