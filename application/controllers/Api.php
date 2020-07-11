@@ -16,6 +16,18 @@ class Api extends RestController {
         $this->load->helper("file");
         $this->load->database();
     }
+    public function alldata_get(){
+        $all_data = [
+            "ubicacion" =>  $this->db->get("ubicacion")->result(),
+            "parqueo" =>  $this->db->get("parqueo")->result(),
+            "usuario" =>  $this->db->get("usuario")->result(),
+            "comentario" =>  $this->db->get("comentario")->result(),
+            "calificacion" =>  $this->db->get("calificacion")->result(),
+            "imagen" => $this->db->get("imagen")->result()
+        ];
+        $this->response($all_data, 200);
+
+    }
     /// INICIO BLOQUE UBICACION ///
 
     //Obtener un arreglo de ubicaciones o una ubicacion en especifico.
@@ -149,7 +161,7 @@ class Api extends RestController {
         $this->db->insert('comentario',$input);
         if($this->db->affected_rows() > 0)
         {
-            $this->response(['resultado' => '1'], 200);
+            $this->response(['resultado' => '1', 'id_comentario' => $this->db->insert_id()], 200);
         }else{
             $this->response(['resultado' => '0'], 200);
         }
@@ -201,7 +213,8 @@ class Api extends RestController {
         $this->db->insert('calificacion',$input);
         if($this->db->affected_rows() > 0)
         {
-            $this->response(['resultado' => '1'], 200);
+            $q = $this->db->get_where("calificacion",['id_calificacion'=>$this->db->insert_id()]);
+            $this->response(['resultado' => '1','insertado' => $q->row()], 200);
         }else{
             $this->response(['resultado' => '0'], 200);
         }
@@ -345,24 +358,23 @@ class Api extends RestController {
         //Valores esperados = base64
 
         $input = $this->put();
-        if(array_key_exists('id_ubicacion',$input) || array_key_exists('id_comentario', $input)){
+        if(array_key_exists('id_ubicacion',$input)){
             $imagen = base64_decode($input['base64']);
             $image_name = md5(uniqid(rand(), true));
             $filename = $image_name . '.' . $input['extension'];
             $path = FCPATH . "assets/";
             file_put_contents($path . $filename, $imagen);
             $date = date('Y-m-d H:i:s');
-            $valores_insertar = array('fecha_imagen' => $date,'filename' => $filename);
-            if(array_key_exists('id_ubicacion',$input)){
-                $valores_insertar['id_ubicacion'] = $input['id_ubicacion'];
-            }
-            if(array_key_exists('id_comentario', $input)){
-                $valores_insertar['id_comentario'] = $input['id_comentario'];
-            }
+            $valores_insertar = array(
+                'fecha_imagen' => $date,
+                'filename' => $filename,
+                'id_ubicacion' => $input['id_ubicacion'],
+                'es_galeria' => $input['es_galeria']);
             $this->db->insert("imagen",$valores_insertar);
             if($this->db->affected_rows() > 0)
             {
-                $resultado = array('resultado' => 1);
+                $q = $this->db->get_where("imagen",['id_imagen'=>$this->db->insert_id()]);
+                $resultado = array('resultado' => 1, 'imagen_insertada' => $q->row());
             }
         }
         $this->response($resultado, 200);
